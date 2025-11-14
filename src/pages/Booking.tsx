@@ -23,9 +23,9 @@ const Booking = () => {
   const [guests, setGuests] = useState(1);
 
   const rooms: Record<string, any> = {
-    "1": { id: 1, name: "Deluxe Room", image: deluxeRoom, price: 2999 },
-    "2": { id: 2, name: "Standard Room", image: standardRoom, price: 1999 },
-    "3": { id: 3, name: "Executive Suite", image: suiteRoom, price: 4999 },
+    "1": { id: 1, name: "Deluxe Room", image: deluxeRoom, price: 2999, maxGuests: 2 },
+    "2": { id: 2, name: "Standard Room", image: standardRoom, price: 1999, maxGuests: 2 },
+    "3": { id: 3, name: "Executive Suite", image: suiteRoom, price: 4999, maxGuests: 4 },
   };
 
   const room = rooms[id || "1"];
@@ -46,6 +46,11 @@ const Booking = () => {
     
     if (checkOutDate <= checkInDate) {
       toast.error("Check-out date must be after check-in date");
+      return;
+    }
+    
+    if (guests > room.maxGuests) {
+      toast.error(`Maximum ${room.maxGuests} guests allowed for this room`);
       return;
     }
     
@@ -143,13 +148,19 @@ const Booking = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="guests">Number of Guests</Label>
+                        <Label htmlFor="guests">Number of Guests (Max: {room.maxGuests})</Label>
                         <Input
                           id="guests"
                           type="number"
                           min="1"
+                          max={room.maxGuests}
                           value={guests}
-                          onChange={(e) => setGuests(parseInt(e.target.value))}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (value <= room.maxGuests) {
+                              setGuests(value);
+                            }
+                          }}
                           required
                         />
                       </div>
