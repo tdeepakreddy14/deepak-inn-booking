@@ -1,8 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Calendar, Users, MapPin } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";

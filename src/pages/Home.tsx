@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Hotel, Star, Shield, Clock } from "lucide-react";
 import RoomCard from "@/components/RoomCard";
 import Navbar from "@/components/Navbar";
@@ -89,12 +87,18 @@ const Home = () => {
               Your perfect getaway awaits. Experience comfort, hospitality, and unforgettable memories at our beautiful lodging.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" asChild className="text-lg">
-                <Link to="/rooms">Explore Rooms</Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="text-lg">
-                <Link to="/register">Book Now</Link>
-              </Button>
+              <Link
+                to="/rooms"
+                className="inline-flex items-center justify-center rounded-md px-8 py-3 text-lg font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Explore Rooms
+              </Link>
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-md border border-input bg-background px-8 py-3 text-lg font-medium hover:bg-accent transition-colors"
+              >
+                Book Now
+              </Link>
             </div>
           </div>
         </div>
@@ -111,20 +115,15 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                  <CardContent className="pt-6">
-                    <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                      <Icon className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {features.map((feature, index) => (
+              <div key={index} className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 text-center hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <feature.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -146,9 +145,12 @@ const Home = () => {
           </div>
           
           <div className="text-center">
-            <Button size="lg" variant="outline" asChild>
-              <Link to="/rooms">View All Rooms</Link>
-            </Button>
+            <Link
+              to="/rooms"
+              className="inline-flex items-center justify-center rounded-md border border-input bg-background px-6 py-3 font-medium hover:bg-accent transition-colors"
+            >
+              View All Rooms
+            </Link>
           </div>
         </div>
       </section>

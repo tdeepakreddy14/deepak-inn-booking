@@ -1,7 +1,4 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Users, Wifi, Wind } from "lucide-react";
 
 interface RoomCardProps {
@@ -17,50 +14,56 @@ interface RoomCardProps {
 
 const RoomCard = ({ id, name, image, price, capacity, hasAC, hasWifi, description }: RoomCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+    <div className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative h-48 overflow-hidden">
         <img
           src={image}
           alt={name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover transition-transform hover:scale-105"
         />
-        <div className="absolute top-3 right-3">
-          <Badge className="bg-primary text-primary-foreground">
-            ₹{price}/night
-          </Badge>
-        </div>
       </div>
       
-      <CardContent className="flex-1 p-4">
-        <h3 className="text-xl font-semibold mb-2 text-foreground">{name}</h3>
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{description}</p>
-        
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary" className="flex items-center gap-1">
+      <div className="p-6 space-y-4">
+        <div>
+          <h3 className="text-xl font-semibold mb-2">{name}</h3>
+          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-secondary text-secondary-foreground">
             <Users className="h-3 w-3" />
             {capacity} Guests
-          </Badge>
+          </span>
+          
           {hasAC && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/20">
               <Wind className="h-3 w-3" />
               AC
-            </Badge>
+            </span>
           )}
+          
           {hasWifi && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/20">
               <Wifi className="h-3 w-3" />
               WiFi
-            </Badge>
+            </span>
           )}
         </div>
-      </CardContent>
-      
-      <CardFooter className="p-4 pt-0">
-        <Button asChild className="w-full">
-          <Link to={`/rooms/${id}`}>View Details</Link>
-        </Button>
-      </CardFooter>
-    </Card>
+
+        <div className="flex items-center justify-between pt-4 border-t border-border">
+          <div>
+            <span className="text-2xl font-bold text-primary">₹{price}</span>
+            <span className="text-sm text-muted-foreground ml-1">/night</span>
+          </div>
+          <Link
+            to={`/rooms/${id}`}
+            className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            View Details
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 };
 

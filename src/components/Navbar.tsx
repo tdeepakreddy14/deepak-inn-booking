@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Menu, X, Hotel, User, Calendar } from "lucide-react";
+import { Menu, X, Hotel, User } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 const Navbar = () => {
@@ -40,15 +39,19 @@ const Navbar = () => {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="ghost" asChild>
-              <Link to="/login">
-                <User className="mr-2 h-4 w-4" />
-                Login
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/register">Get Started</Link>
-            </Button>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+            >
+              <User className="h-4 w-4" />
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Get Started
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -77,17 +80,21 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-3 space-y-2">
-              <Button variant="outline" className="w-full" asChild>
-                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  <User className="mr-2 h-4 w-4" />
-                  Login
-                </Link>
-              </Button>
-              <Button className="w-full" asChild>
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  Get Started
-                </Link>
-              </Button>
+              <Link
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex w-full items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent transition-colors"
+              >
+                <User className="h-4 w-4" />
+                Login
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                Get Started
+              </Link>
             </div>
           </div>
         )}
