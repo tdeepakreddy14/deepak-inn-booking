@@ -1,9 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Users, Wifi, Wind, Tv, Coffee, Shield, ArrowLeft } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
