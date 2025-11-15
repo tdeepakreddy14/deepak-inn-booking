@@ -1,8 +1,9 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, Users, MapPin } from "lucide-react";
+import { Calendar, Users } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
+import "./MyBookings.css";
 
 const MyBookings = () => {
   // Mock bookings data

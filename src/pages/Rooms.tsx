@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
 import suiteRoom from "@/assets/room-suite.jpg";
+import "./Rooms.css";
 
 const Rooms = () => {
   const [searchTerm, setSearchTerm] = useState("");
