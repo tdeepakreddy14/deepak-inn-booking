@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Users, Wifi, Wind } from "lucide-react";
+import "./RoomCard.css";
 
 interface RoomCardProps {
   id: number;
@@ -14,52 +15,44 @@ interface RoomCardProps {
 
 const RoomCard = ({ id, name, image, price, capacity, hasAC, hasWifi, description }: RoomCardProps) => {
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover transition-transform hover:scale-105"
-        />
-      </div>
-      
-      <div className="p-6 space-y-4">
-        <div>
-          <h3 className="text-xl font-semibold mb-2">{name}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-secondary text-secondary-foreground">
-            <Users className="h-3 w-3" />
-            {capacity} Guests
-          </span>
-          
-          {hasAC && (
-            <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/20">
-              <Wind className="h-3 w-3" />
-              AC
-            </span>
-          )}
-          
-          {hasWifi && (
-            <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-primary/10 text-primary border-primary/20">
-              <Wifi className="h-3 w-3" />
-              WiFi
-            </span>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between pt-4 border-t border-border">
-          <div>
-            <span className="text-2xl font-bold text-primary">₹{price}</span>
-            <span className="text-sm text-muted-foreground ml-1">/night</span>
+    <div className="room-card">
+      <img src={image} alt={name} className="room-card-image" />
+      <div className="room-card-content">
+        <div className="room-card-header">
+          <h3 className="room-card-title">{name}</h3>
+          <div className="room-card-price">
+            <p className="room-card-price-label">Per Night</p>
+            <p className="room-card-price-amount">₹{price.toLocaleString()}</p>
           </div>
-          <Link
-            to={`/rooms/${id}`}
-            className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
+        </div>
+        
+        <p className="room-card-description">{description}</p>
+        
+        <div className="room-card-features">
+          <div className="room-card-feature">
+            <Users />
+            <span>{capacity} Guests</span>
+          </div>
+          {hasWifi && (
+            <div className="room-card-feature">
+              <Wifi />
+              <span>Free WiFi</span>
+            </div>
+          )}
+          {hasAC && (
+            <div className="room-card-feature">
+              <Wind />
+              <span>AC</span>
+            </div>
+          )}
+        </div>
+
+        <div className="room-card-actions">
+          <Link to={`/rooms/${id}`} className="room-card-btn room-card-btn-outline">
             View Details
+          </Link>
+          <Link to={`/booking/${id}`} className="room-card-btn room-card-btn-primary">
+            Book Now
           </Link>
         </div>
       </div>
