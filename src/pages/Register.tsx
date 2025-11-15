@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,18 +6,26 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Hotel } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
-    phone: "",
     password: "",
     confirmPassword: "",
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -25,13 +33,32 @@ const Register = () => {
       return;
     }
     
-    // Mock registration (in real app, call API)
-    if (formData.name && formData.email && formData.password) {
-      toast.success("Registration successful! Please login.");
-      navigate("/login");
+    setLoading(true);
+
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error, data } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+
+    if (error) {
+      toast.error(error.message);
     } else {
-      toast.error("Please fill in all fields");
+      // Insert default user role
+      if (data.user) {
+        await supabase.from('user_roles').insert([
+          { user_id: data.user.id, role: 'user' }
+        ]);
+      }
+      
+      toast.success("Registration successful! You can now login.");
+      navigate("/login");
     }
+    setLoading(false);
   };
 
   return (
@@ -51,17 +78,6 @@ const Register = () => {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -69,18 +85,6 @@ const Register = () => {
                 placeholder="your.email@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+91 9876543210"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 required
               />
             </div>
@@ -94,6 +98,7 @@ const Register = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
+                minLength={6}
               />
             </div>
             
@@ -106,13 +111,14 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
+                minLength={6}
               />
             </div>
           </CardContent>
           
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Creating account..." : "Sign Up"}
             </Button>
             
             <p className="text-sm text-center text-muted-foreground">

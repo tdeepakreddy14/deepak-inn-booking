@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,24 +6,40 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Hotel } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Mock authentication (in real app, call API)
-    if (formData.email && formData.password) {
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password,
+    });
+
+    if (error) {
+      toast.error(error.message);
+    } else {
       toast.success("Login successful!");
       navigate("/");
-    } else {
-      toast.error("Please fill in all fields");
     }
+    setLoading(false);
   };
 
   return (
@@ -55,12 +71,7 @@ const Login = () => {
             </div>
             
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link to="#" className="text-sm text-primary hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -73,8 +84,8 @@ const Login = () => {
           </CardContent>
           
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full">
-              Sign In
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
             
             <p className="text-sm text-center text-muted-foreground">
