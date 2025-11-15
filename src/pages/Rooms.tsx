@@ -14,7 +14,7 @@ import suiteRoom from "@/assets/room-suite.jpg";
 
 const Rooms = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [priceRange, setPriceRange] = useState([0, 6000]);
   const [roomType, setRoomType] = useState("all");
   const [acFilter, setAcFilter] = useState("all");
 
@@ -43,28 +43,6 @@ const Rooms = () => {
     },
     {
       id: 3,
-      name: "Executive Suite",
-      image: suiteRoom,
-      price: 4999,
-      capacity: 4,
-      hasAC: true,
-      hasWifi: true,
-      description: "Luxurious suite with separate living area and premium furnishings.",
-      type: "suite",
-    },
-    {
-      id: 4,
-      name: "Premium Deluxe",
-      image: deluxeRoom,
-      price: 3499,
-      capacity: 3,
-      hasAC: true,
-      hasWifi: true,
-      description: "Enhanced deluxe room with additional space and amenities.",
-      type: "deluxe",
-    },
-    {
-      id: 5,
       name: "Budget Room",
       image: standardRoom,
       price: 1499,
@@ -75,7 +53,7 @@ const Rooms = () => {
       type: "standard",
     },
     {
-      id: 6,
+      id: 4,
       name: "Family Suite",
       image: suiteRoom,
       price: 5999,
@@ -135,7 +113,7 @@ const Rooms = () => {
                   <div className="pt-2">
                     <Slider
                       min={0}
-                      max={10000}
+                      max={6000}
                       step={500}
                       value={priceRange}
                       onValueChange={setPriceRange}
