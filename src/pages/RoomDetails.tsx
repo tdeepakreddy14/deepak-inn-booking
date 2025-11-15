@@ -59,12 +59,12 @@ const RoomDetails = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <Card className="p-8 text-center">
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">Room Not Found</h2>
-            <Button asChild>
-              <Link to="/rooms">Back to Rooms</Link>
-            </Button>
-          </Card>
+            <Link to="/rooms" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+              Back to Rooms
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>
@@ -77,12 +77,10 @@ const RoomDetails = () => {
       
       <div className="flex-1 container mx-auto px-4 py-8">
         {/* Back Button */}
-        <Button variant="ghost" asChild className="mb-6">
-          <Link to="/rooms">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Rooms
-          </Link>
-        </Button>
+        <Link to="/rooms" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 mb-6">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Rooms
+        </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -102,11 +100,11 @@ const RoomDetails = () => {
                 <div>
                   <h1 className="text-3xl md:text-4xl font-bold mb-2">{room.name}</h1>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary" className="flex items-center gap-1">
+                    <span className="inline-flex items-center rounded-full border border-transparent bg-secondary text-secondary-foreground px-2.5 py-0.5 text-xs font-semibold gap-1">
                       <Users className="h-3 w-3" />
                       Up to {room.capacity} Guests
-                    </Badge>
-                    <Badge variant="secondary">{room.size}</Badge>
+                    </span>
+                    <span className="inline-flex items-center rounded-full border border-transparent bg-secondary text-secondary-foreground px-2.5 py-0.5 text-xs font-semibold">{room.size}</span>
                   </div>
                 </div>
               </div>
@@ -130,8 +128,8 @@ const RoomDetails = () => {
 
           {/* Booking Card */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-20">
-              <CardContent className="p-6">
+            <div className="bg-card border border-border rounded-lg shadow-sm sticky top-20">
+              <div className="p-6">
                 <div className="mb-6">
                   <div className="flex items-baseline mb-2">
                     <span className="text-4xl font-bold text-primary">₹{room.price}</span>
@@ -141,9 +139,9 @@ const RoomDetails = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <Button asChild className="w-full" size="lg">
-                    <Link to={`/booking/${room.id}`}>Book Now</Link>
-                  </Button>
+                  <Link to={`/booking/${room.id}`} className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full">
+                    Book Now
+                  </Link>
                   
                   <div className="border-t border-border pt-4">
                     <h3 className="font-semibold mb-3">Quick Highlights</h3>
@@ -178,8 +176,8 @@ const RoomDetails = () => {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
