@@ -1,11 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Users, Wifi, Wind, Tv, Coffee, Shield, ArrowLeft } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
 import suiteRoom from "@/assets/room-suite.jpg";
-import "./RoomDetails.css";
 
 const RoomDetails = () => {
   const { id } = useParams();
@@ -57,15 +59,15 @@ const RoomDetails = () => {
 
   if (!room) {
     return (
-      <div className="room-details">
+      <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="room-not-found">
-          <div className="not-found-card">
-            <h2 className="not-found-title">Room Not Found</h2>
-            <Link to="/rooms" className="not-found-btn">
-              Back to Rooms
-            </Link>
-          </div>
+        <div className="flex-1 flex items-center justify-center">
+          <Card className="p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">Room Not Found</h2>
+            <Button asChild>
+              <Link to="/rooms">Back to Rooms</Link>
+            </Button>
+          </Card>
         </div>
         <Footer />
       </div>
@@ -73,130 +75,121 @@ const RoomDetails = () => {
   }
 
   return (
-    <div className="room-details">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="room-main">
+      <div className="flex-1 container mx-auto px-4 py-8">
         {/* Back Button */}
-        <Link to="/rooms" className="back-button">
-          <ArrowLeft className="back-icon" />
-          Back to Rooms
-        </Link>
+        <Button variant="ghost" asChild className="mb-6">
+          <Link to="/rooms">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Rooms
+          </Link>
+        </Button>
 
-        <div className="room-layout">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="room-content">
-            <img
-              src={room.image}
-              alt={room.name}
-              className="room-image"
-            />
-
-            <div className="room-header">
-              <div>
-                <h1 className="room-name">{room.name}</h1>
-                <div className="room-info">
-                  <div className="info-item">
-                    <Users />
-                    <span>Up to {room.capacity} Guests</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="room-size">{room.size}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="room-price-badge">
-                <div className="price-label">Starting from</div>
-                <div className="price-amount">₹{room.price.toLocaleString()}</div>
-                <div className="price-period">per night</div>
-              </div>
+          <div className="lg:col-span-2 space-y-6">
+            {/* Image */}
+            <div className="relative h-96 rounded-lg overflow-hidden">
+              <img
+                src={room.image}
+                alt={room.name}
+                className="w-full h-full object-cover"
+              />
             </div>
 
-            <div className="room-section">
-              <h2 className="section-title">Description</h2>
-              <p className="section-text">{room.longDescription}</p>
-            </div>
-
-            <div className="room-section">
-              <h2 className="section-title">Amenities</h2>
-              <div className="amenities-grid">
-                {room.amenities.map((amenity: string, index: number) => (
-                  <div key={index} className="amenity-item">
-                    {getAmenityIcon(amenity)}
-                    <span>{amenity}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="room-section">
-              <h2 className="section-title">Room Features</h2>
-              <div className="features-grid">
-                <div className="feature-badge">
-                  <Wind />
-                  <span>Air Conditioned</span>
-                </div>
-                <div className="feature-badge">
-                  <Wifi />
-                  <span>Free WiFi</span>
-                </div>
-                <div className="feature-badge">
-                  <Tv />
-                  <span>LED TV</span>
-                </div>
-                <div className="feature-badge">
-                  <Coffee />
-                  <span>Coffee Maker</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="room-section">
-              <h2 className="section-title">Cancellation Policy</h2>
-              <div className="policy-card">
-                <Shield className="policy-icon" />
+            {/* Room Info */}
+            <div>
+              <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="policy-title">Flexible Cancellation</p>
-                  <p className="policy-text">
-                    Free cancellation up to 24 hours before check-in. After that, a cancellation fee may apply.
-                  </p>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-2">{room.name}</h1>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      Up to {room.capacity} Guests
+                    </Badge>
+                    <Badge variant="secondary">{room.size}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-muted-foreground mb-6">{room.longDescription}</p>
+
+              {/* Amenities */}
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Amenities</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {room.amenities.map((amenity: string, index: number) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Shield className="h-4 w-4 text-primary" />
+                      <span className="text-sm">{amenity}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Booking Sidebar */}
-          <div className="booking-sidebar">
-            <div className="booking-card">
-              <h3 className="booking-title">Book This Room</h3>
-              <div className="booking-price">
-                <span className="price-label">Price per night</span>
-                <span className="price-value">₹{room.price.toLocaleString()}</span>
-              </div>
-              <Link to={`/booking/${room.id}`} className="book-now-btn">
-                Book Now
-              </Link>
-              <div className="booking-info">
-                <p>✓ Best Price Guarantee</p>
-                <p>✓ Instant Confirmation</p>
-                <p>✓ Secure Payment</p>
-              </div>
-            </div>
+          {/* Booking Card */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-20">
+              <CardContent className="p-6">
+                <div className="mb-6">
+                  <div className="flex items-baseline mb-2">
+                    <span className="text-4xl font-bold text-primary">₹{room.price}</span>
+                    <span className="text-muted-foreground ml-2">/ night</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Inclusive of all taxes</p>
+                </div>
+
+                <div className="space-y-4">
+                  <Button asChild className="w-full" size="lg">
+                    <Link to={`/booking/${room.id}`}>Book Now</Link>
+                  </Button>
+                  
+                  <div className="border-t border-border pt-4">
+                    <h3 className="font-semibold mb-3">Quick Highlights</h3>
+                    <div className="space-y-2">
+                      {room.hasAC && (
+                        <div className="flex items-center text-sm">
+                          <Wind className="h-4 w-4 mr-2 text-primary" />
+                          <span>Air Conditioned</span>
+                        </div>
+                      )}
+                      {room.hasWifi && (
+                        <div className="flex items-center text-sm">
+                          <Wifi className="h-4 w-4 mr-2 text-primary" />
+                          <span>Free WiFi</span>
+                        </div>
+                      )}
+                      <div className="flex items-center text-sm">
+                        <Tv className="h-4 w-4 mr-2 text-primary" />
+                        <span>LED Television</span>
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <Coffee className="h-4 w-4 mr-2 text-primary" />
+                        <span>Coffee Maker</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-border pt-4">
+                    <h3 className="font-semibold mb-2">Cancellation Policy</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Free cancellation up to 24 hours before check-in. Full refund applicable.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </main>
+      </div>
 
       <Footer />
     </div>
   );
-};
-
-const getAmenityIcon = (amenity: string) => {
-  if (amenity.toLowerCase().includes('wifi')) return <Wifi className="amenity-icon" />;
-  if (amenity.toLowerCase().includes('tv')) return <Tv className="amenity-icon" />;
-  if (amenity.toLowerCase().includes('coffee')) return <Coffee className="amenity-icon" />;
-  if (amenity.toLowerCase().includes('air') || amenity.toLowerCase().includes('ac')) return <Wind className="amenity-icon" />;
-  return <Shield className="amenity-icon" />;
 };
 
 export default RoomDetails;

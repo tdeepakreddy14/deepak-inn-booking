@@ -2,11 +2,15 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RoomCard from "@/components/RoomCard";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
 import suiteRoom from "@/assets/room-suite.jpg";
-import "./Rooms.css";
 
 const Rooms = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -105,39 +109,37 @@ const Rooms = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters Sidebar */}
           <aside className="lg:col-span-1">
-            <div className="bg-card border border-border rounded-lg shadow-sm">
-              <div className="p-6 border-b border-border">
-                <h3 className="text-lg font-semibold">Filters</h3>
-              </div>
-              <div className="p-6 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Filters</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 {/* Search */}
                 <div className="space-y-2">
-                  <label htmlFor="search" className="text-sm font-medium">Search</label>
+                  <Label htmlFor="search">Search</Label>
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <input
+                    <Input
                       id="search"
-                      type="text"
                       placeholder="Search rooms..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-9"
+                      className="pl-9"
                     />
                   </div>
                 </div>
 
                 {/* Price Range */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Price Range</label>
+                  <Label>Price Range</Label>
                   <div className="pt-2">
-                    <input
-                      type="range"
+                    <Slider
                       min={0}
                       max={10000}
                       step={500}
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary mb-2"
+                      value={priceRange}
+                      onValueChange={setPriceRange}
+                      className="mb-2"
                     />
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>₹{priceRange[0]}</span>
@@ -148,36 +150,36 @@ const Rooms = () => {
 
                 {/* Room Type */}
                 <div className="space-y-2">
-                  <label htmlFor="room-type" className="text-sm font-medium">Room Type</label>
-                  <select
-                    id="room-type"
-                    value={roomType}
-                    onChange={(e) => setRoomType(e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="all">All Types</option>
-                    <option value="standard">Standard</option>
-                    <option value="deluxe">Deluxe</option>
-                    <option value="suite">Suite</option>
-                  </select>
+                  <Label htmlFor="room-type">Room Type</Label>
+                  <Select value={roomType} onValueChange={setRoomType}>
+                    <SelectTrigger id="room-type">
+                      <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="deluxe">Deluxe</SelectItem>
+                      <SelectItem value="suite">Suite</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* AC Filter */}
                 <div className="space-y-2">
-                  <label htmlFor="ac-filter" className="text-sm font-medium">Air Conditioning</label>
-                  <select
-                    id="ac-filter"
-                    value={acFilter}
-                    onChange={(e) => setAcFilter(e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="all">All</option>
-                    <option value="ac">AC</option>
-                    <option value="non-ac">Non-AC</option>
-                  </select>
+                  <Label htmlFor="ac-filter">Air Conditioning</Label>
+                  <Select value={acFilter} onValueChange={setAcFilter}>
+                    <SelectTrigger id="ac-filter">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="ac">AC</SelectItem>
+                      <SelectItem value="non-ac">Non-AC</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </aside>
 
           {/* Rooms Grid */}
@@ -195,9 +197,9 @@ const Rooms = () => {
                 ))}
               </div>
             ) : (
-              <div className="bg-card border border-border rounded-lg shadow-sm p-12 text-center">
+              <Card className="p-12 text-center">
                 <p className="text-muted-foreground">No rooms match your filters. Try adjusting your search criteria.</p>
-              </div>
+              </Card>
             )}
           </div>
         </div>
