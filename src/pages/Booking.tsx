@@ -2,18 +2,12 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
 import suiteRoom from "@/assets/room-suite.jpg";
+import "./Booking.css";
 
 const Booking = () => {
   const { id } = useParams();
@@ -59,189 +53,158 @@ const Booking = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="booking-page">
       <Navbar />
       
-      <div className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-8">Complete Your Booking</h1>
+      <main className="booking-main">
+        <h1 className="booking-title">Complete Your Booking</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="booking-layout">
           {/* Booking Form */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Booking Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Guest Information */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Guest Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input id="phone" type="tel" required />
-                      </div>
-                    </div>
+          <div className="booking-form-section">
+            <div className="booking-form-header">
+              <h2 className="booking-form-title">Booking Details</h2>
+            </div>
+            <form onSubmit={handleSubmit} className="booking-form">
+              {/* Guest Information */}
+              <div className="form-section">
+                <h3 className="form-section-title">Guest Information</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label htmlFor="firstName" className="form-label">First Name</label>
+                    <input id="firstName" type="text" className="form-input" required />
                   </div>
-
-                  {/* Stay Details */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Stay Details</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Check-in Date</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal"
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {checkInDate ? format(checkInDate, "PPP") : "Select date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={checkInDate}
-                              onSelect={setCheckInDate}
-                              disabled={(date) => date < new Date()}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Check-out Date</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal"
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {checkOutDate ? format(checkOutDate, "PPP") : "Select date"}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={checkOutDate}
-                              onSelect={setCheckOutDate}
-                              disabled={(date) => !checkInDate || date <= checkInDate}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="guests">Number of Guests (Max: {room.maxGuests})</Label>
-                        <Input
-                          id="guests"
-                          type="number"
-                          min="1"
-                          max={room.maxGuests}
-                          value={guests}
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value);
-                            if (value <= room.maxGuests) {
-                              setGuests(value);
-                            }
-                          }}
-                          required
-                        />
-                      </div>
-                    </div>
+                  <div className="form-group">
+                    <label htmlFor="lastName" className="form-label">Last Name</label>
+                    <input id="lastName" type="text" className="form-input" required />
                   </div>
-
-                  {/* Special Requests */}
-                  <div className="space-y-2">
-                    <Label htmlFor="requests">Special Requests (Optional)</Label>
-                    <Input id="requests" placeholder="Any special requirements?" />
+                  <div className="form-group">
+                    <label htmlFor="email" className="form-label">Email</label>
+                    <input id="email" type="email" className="form-input" required />
                   </div>
+                  <div className="form-group">
+                    <label htmlFor="phone" className="form-label">Phone</label>
+                    <input id="phone" type="tel" className="form-input" required />
+                  </div>
+                </div>
+              </div>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    Confirm Booking
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+              {/* Stay Details */}
+              <div className="form-section">
+                <h3 className="form-section-title">Stay Details</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label htmlFor="checkIn" className="form-label">Check-in Date</label>
+                    <button
+                      type="button"
+                      className={`date-picker-button ${!checkInDate ? 'empty' : ''}`}
+                      onClick={() => {
+                        const date = prompt("Enter check-in date (YYYY-MM-DD):");
+                        if (date) setCheckInDate(new Date(date));
+                      }}
+                    >
+                      <span>{checkInDate ? checkInDate.toLocaleDateString() : "Pick a date"}</span>
+                      <CalendarIcon />
+                    </button>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="checkOut" className="form-label">Check-out Date</label>
+                    <button
+                      type="button"
+                      className={`date-picker-button ${!checkOutDate ? 'empty' : ''}`}
+                      onClick={() => {
+                        const date = prompt("Enter check-out date (YYYY-MM-DD):");
+                        if (date) setCheckOutDate(new Date(date));
+                      }}
+                    >
+                      <span>{checkOutDate ? checkOutDate.toLocaleDateString() : "Pick a date"}</span>
+                      <CalendarIcon />
+                    </button>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="guests" className="form-label">Number of Guests</label>
+                    <input
+                      id="guests"
+                      type="number"
+                      min={1}
+                      max={room.maxGuests}
+                      value={guests}
+                      onChange={(e) => setGuests(parseInt(e.target.value))}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Special Requests */}
+              <div className="form-section">
+                <h3 className="form-section-title">Special Requests</h3>
+                <div className="form-group">
+                  <label htmlFor="requests" className="form-label">Additional Notes</label>
+                  <textarea
+                    id="requests"
+                    rows={4}
+                    placeholder="Any special requirements?"
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="booking-submit">
+                Confirm Booking
+              </button>
+            </form>
           </div>
 
           {/* Booking Summary */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-20">
-              <CardHeader>
-                <CardTitle>Booking Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="aspect-video rounded-lg overflow-hidden">
-                  <img
-                    src={room.image}
-                    alt={room.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold text-lg">{room.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    ₹{room.price} per night
-                  </p>
-                </div>
-
-                {checkInDate && checkOutDate && (
-                  <div className="space-y-2 pt-4 border-t">
-                    <div className="flex justify-between text-sm">
-                      <span>Check-in:</span>
-                      <span>{format(checkInDate, "PPP")}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Check-out:</span>
-                      <span>{format(checkOutDate, "PPP")}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Nights:</span>
-                      <span>
-                        {Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24))}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Guests:</span>
-                      <span>{guests}</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-4 border-t">
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-lg">Total:</span>
-                    <span className="text-2xl font-bold text-primary">
-                      ₹{calculateTotal().toLocaleString()}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Inclusive of all taxes
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="booking-summary-section">
+            <div className="summary-header">
+              <h2 className="summary-title">Booking Summary</h2>
+            </div>
+            <img
+              src={room.image}
+              alt={room.name}
+              className="summary-room-image"
+            />
+            <h3 className="summary-room-name">{room.name}</h3>
+            <div className="summary-details">
+              <div className="summary-detail-item">
+                <span className="summary-detail-label">Check-in</span>
+                <span className="summary-detail-value">
+                  {checkInDate ? checkInDate.toLocaleDateString() : "Not selected"}
+                </span>
+              </div>
+              <div className="summary-detail-item">
+                <span className="summary-detail-label">Check-out</span>
+                <span className="summary-detail-value">
+                  {checkOutDate ? checkOutDate.toLocaleDateString() : "Not selected"}
+                </span>
+              </div>
+              <div className="summary-detail-item">
+                <span className="summary-detail-label">Nights</span>
+                <span className="summary-detail-value">
+                  {checkInDate && checkOutDate
+                    ? Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24))
+                    : 0}
+                </span>
+              </div>
+              <div className="summary-detail-item">
+                <span className="summary-detail-label">Guests</span>
+                <span className="summary-detail-value">{guests}</span>
+              </div>
+              <div className="summary-detail-item">
+                <span className="summary-detail-label">Price per night</span>
+                <span className="summary-detail-value">₹{room.price.toLocaleString()}</span>
+              </div>
+              <div className="summary-divider"></div>
+              <div className="summary-total">
+                <span>Total Amount</span>
+                <span className="summary-total-amount">₹{calculateTotal().toLocaleString()}</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
 
       <Footer />
     </div>
