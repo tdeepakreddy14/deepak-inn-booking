@@ -1,21 +1,12 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Hotel, User, Calendar, LayoutDashboard, LogOut } from "lucide-react";
+import { Menu, X, Hotel } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, isAdmin, signOut } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-    setIsMenuOpen(false);
-  };
 
   const navLinks = [
     { to: "/", label: "Home" },
@@ -47,34 +38,11 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop CTA Button */}
           <div className="hidden md:flex items-center space-x-3">
-            {isAdmin && (
-              <Button variant="ghost" asChild>
-                <Link to="/admin">
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Admin
-                </Link>
-              </Button>
-            )}
-            {user ? (
-              <Button variant="ghost" onClick={handleSignOut}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
-            ) : (
-              <>
-                <Button variant="ghost" asChild>
-                  <Link to="/login">
-                    <User className="mr-2 h-4 w-4" />
-                    Login
-                  </Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/register">Get Started</Link>
-                </Button>
-              </>
-            )}
+            <Button asChild>
+              <Link to="/rooms">Book Now</Link>
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -102,35 +70,12 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-3 space-y-2">
-              {isAdmin && (
-                <Button variant="outline" className="w-full" asChild>
-                  <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Admin
-                  </Link>
-                </Button>
-              )}
-              {user ? (
-                <Button variant="outline" className="w-full" onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
-              ) : (
-                <>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      <User className="mr-2 h-4 w-4" />
-                      Login
-                    </Link>
-                  </Button>
-                  <Button className="w-full" asChild>
-                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                      Get Started
-                    </Link>
-                  </Button>
-                </>
-              )}
+            <div className="pt-3">
+              <Button className="w-full" asChild>
+                <Link to="/rooms" onClick={() => setIsMenuOpen(false)}>
+                  Book Now
+                </Link>
+              </Button>
             </div>
           </div>
         )}
