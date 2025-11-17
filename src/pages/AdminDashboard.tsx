@@ -11,6 +11,7 @@ import { Hotel, Users, Calendar, DollarSign } from 'lucide-react';
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { isAdmin, loading } = useAuth();
+
   const [stats, setStats] = useState({
     totalRooms: 0,
     availableRooms: 0,
@@ -18,36 +19,43 @@ export default function AdminDashboard() {
     totalUsers: 0,
   });
 
+  // 🔴  ADMIN CHECK DISABLED FOR UI TESTING
+  /*
   useEffect(() => {
-    if (!loading && !isAdmin) {
-      navigate('/');
+    if (loading) return;      
+    if (!isAdmin) {
+      navigate('/', { replace: true });
     }
   }, [isAdmin, loading, navigate]);
+  */
 
   useEffect(() => {
     const fetchStats = async () => {
       const { data: rooms } = await supabase.from('rooms').select('id, available');
       const { data: users } = await supabase.from('user_roles').select('user_id');
-      
+
       setStats({
         totalRooms: rooms?.length || 0,
         availableRooms: rooms?.filter(r => r.available).length || 0,
-        totalBookings: 0, // Will be implemented with bookings table
+        totalBookings: 0,
         totalUsers: users?.length || 0,
       });
     };
 
-    if (isAdmin) {
-      fetchStats();
-    }
-  }, [isAdmin]);
+    // 🔴  ALLOW FETCHING EVEN IF NOT ADMIN
+    // if (isAdmin) fetchStats();
+    fetchStats();
+  }, []);
+
+  // 🔴 REMOVE ADMIN BLOCKER (so UI always loads)
+  /*
+  if (!isAdmin) {
+    return null;
+  }
+  */
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
-  if (!isAdmin) {
-    return null;
   }
 
   return (

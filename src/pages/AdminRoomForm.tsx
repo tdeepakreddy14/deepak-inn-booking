@@ -18,6 +18,7 @@ export default function AdminRoomForm() {
   const { isAdmin, loading } = useAuth();
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -30,17 +31,21 @@ export default function AdminRoomForm() {
     available: true,
   });
 
+  // 🔴 ADMIN CHECK DISABLED FOR UI TESTING
+  /*
   useEffect(() => {
     if (!loading && !isAdmin) {
       navigate('/');
     }
   }, [isAdmin, loading, navigate]);
+  */
 
   useEffect(() => {
-    if (id && isAdmin) {
+    // Allow fetching even when NOT admin for UI testing
+    if (id) {
       fetchRoom();
     }
-  }, [id, isAdmin]);
+  }, [id]);
 
   const fetchRoom = async () => {
     const { data, error } = await supabase
@@ -107,16 +112,21 @@ export default function AdminRoomForm() {
       });
       navigate('/admin/rooms');
     }
+
     setSubmitting(false);
   };
 
+  // Keep loader but REMOVE admin blocker
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
+  // 🔴 Remove admin restriction (UI testing only)
+  /*
   if (!isAdmin) {
     return null;
   }
+  */
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -128,8 +138,10 @@ export default function AdminRoomForm() {
               {id ? 'Edit Room' : 'Create New Room'}
             </CardTitle>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+
               <div className="space-y-2">
                 <Label htmlFor="name">Room Name *</Label>
                 <Input
@@ -228,6 +240,7 @@ export default function AdminRoomForm() {
                 <Button type="submit" disabled={submitting} className="flex-1">
                   {submitting ? 'Saving...' : id ? 'Update Room' : 'Create Room'}
                 </Button>
+
                 <Button
                   type="button"
                   variant="outline"
