@@ -93,7 +93,7 @@ const Home = () => {
                 <Link to="/rooms">Explore Rooms</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="text-lg">
-                <Link to="/rooms">Book Now</Link>
+                <Link to="/register">Book Now</Link>
               </Button>
             </div>
           </div>
