@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, replace, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Hotel } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, login, isAdmin } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -19,28 +18,62 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (isAdmin) {
+      navigate("/admin")
+    }
     if (user) {
-      navigate("/");
+      navigate("/", { replace: true });
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: formData.email,
-      password: formData.password,
-    });
+    fetch("http://localhost:8000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }),
+    })
+      .then(async (response) => {
+        const data = await response.json();
 
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Login successful!");
-      navigate("/");
-    }
-    setLoading(false);
+        console.log(data, "data_____")
+        if (!response.ok) {
+          throw new Error(data.detail || "Login failed");
+        }
+
+        if (!data.success) {
+          throw new Error(data.error);
+        }
+
+        const token = data.data.session.access_token;
+        const user = data.data.user;
+
+        // 🔥 STORE IN CONTEXT
+        login(user, token);
+
+        toast.success("Login successful!");
+
+        //Navigate to admin page if admin
+        if (user.role === "admin") {
+          navigate("/admin")
+        } else
+          navigate("/");
+      })
+      .catch((error) => {
+        toast.error(error.message || "Network error");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
@@ -55,7 +88,7 @@ const Login = () => {
           <CardTitle className="text-2xl">Welcome Back</CardTitle>
           <CardDescription>Enter your credentials to access your account</CardDescription>
         </CardHeader>
-        
+
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -69,7 +102,7 @@ const Login = () => {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -82,12 +115,12 @@ const Login = () => {
               />
             </div>
           </CardContent>
-          
+
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
-            
+
             <p className="text-sm text-center text-muted-foreground">
               Don't have an account?{" "}
               <Link to="/register" className="text-primary hover:underline font-medium">

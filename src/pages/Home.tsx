@@ -6,43 +6,79 @@ import RoomCard from "@/components/RoomCard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import heroImage from "@/assets/hero-hotel.jpg";
-import deluxeRoom from "@/assets/room-deluxe.jpg";
-import standardRoom from "@/assets/room-standard.jpg";
-import suiteRoom from "@/assets/room-suite.jpg";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
+import { fetchRooms } from "@/integrations/apis/room-apis/fetchRoom";
+
 
 const Home = () => {
-  const featuredRooms = [
-    {
-      id: 1,
-      name: "Deluxe Room",
-      image: deluxeRoom,
-      price: 2999,
-      capacity: 2,
-      hasAC: true,
-      hasWifi: true,
-      description: "Spacious room with modern amenities and king-size bed.",
-    },
-    {
-      id: 2,
-      name: "Standard Room",
-      image: standardRoom,
-      price: 1999,
-      capacity: 2,
-      hasAC: true,
-      hasWifi: true,
-      description: "Comfortable twin bed room perfect for travelers.",
-    },
-    {
-      id: 3,
-      name: "Executive Suite",
-      image: suiteRoom,
-      price: 4999,
-      capacity: 4,
-      hasAC: true,
-      hasWifi: true,
-      description: "Luxurious suite with separate living area and premium furnishings.",
-    },
-  ];
+  // const featuredRooms = [
+  //   {
+  //     id: 1,
+  //     type: "Deluxe Room",
+  //     image: deluxeRoom,
+  //     price: 2999,
+  //     capacity: 2,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Spacious room with modern amenities and king-size bed.",
+  //   },
+  //   {
+  //     id: 2,
+  //     type: "Standard Room",
+  //     image: standardRoom,
+  //     price: 1999,
+  //     capacity: 2,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Comfortable twin bed room perfect for travelers.",
+  //   },
+  //   {
+  //     id: 3,
+  //     type: "Executive Suite",
+  //     image: suiteRoom,
+  //     price: 4999,
+  //     capacity: 4,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Luxurious suite with separate living area and premium furnishings.",
+  //   },
+  // ];
+  const { token } = useAuth();
+  interface Room {
+    id: string;
+    type: string;
+    image: string | null;
+    price: number;
+    capacity: number;
+    hasAC: boolean;
+    hasWifi: boolean;
+    description: string;
+    longDescription: string;
+    amenities: string[];
+    size: string;
+    available: boolean;
+  }
+  const [featuredRooms, setFeaturedRooms] = useState<Room[]>([]);
+
+  useEffect(() => {
+    callGetRooms()
+  }, [])
+
+  const callGetRooms = () => {
+
+    //getAllRoom API call
+    fetchRooms(token)
+      .then((resp) => {
+        setFeaturedRooms(resp.data.rooms);
+        console.log(resp, "resp of all Rooms");
+      })
+      .catch((err) => {
+        console.error("Error fetching rooms:", err);
+      })
+      .finally(() => {
+      });
+  }
 
   const features = [
     {
@@ -70,7 +106,7 @@ const Home = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
         <div
@@ -79,7 +115,7 @@ const Home = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
         </div>
-        
+
         <div className="relative z-10 container mx-auto px-4 text-center md:text-left">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground">
@@ -109,7 +145,7 @@ const Home = () => {
               We offer more than just a place to stay—we provide an experience you'll cherish.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
@@ -138,13 +174,13 @@ const Home = () => {
               Discover our carefully designed rooms that combine comfort with style.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {featuredRooms.map((room) => (
               <RoomCard key={room.id} {...room} />
             ))}
           </div>
-          
+
           <div className="text-center">
             <Button size="lg" variant="outline" asChild>
               <Link to="/rooms">View All Rooms</Link>

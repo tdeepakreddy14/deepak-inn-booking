@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Wifi, Wind } from "lucide-react";
 
 interface RoomCardProps {
-  id: number;
-  name: string;
+  id: string;
+  type: string;
   image: string;
   price: number;
   capacity: number;
@@ -15,13 +15,13 @@ interface RoomCardProps {
   description: string;
 }
 
-const RoomCard = ({ id, name, image, price, capacity, hasAC, hasWifi, description }: RoomCardProps) => {
+const RoomCard = ({ id, type, image, price, capacity, hasAC, hasWifi, description }: RoomCardProps) => {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
       <div className="relative h-48 overflow-hidden">
         <img
           src={image}
-          alt={name}
+          alt={type}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-3 right-3">
@@ -32,7 +32,7 @@ const RoomCard = ({ id, name, image, price, capacity, hasAC, hasWifi, descriptio
       </div>
       
       <CardContent className="flex-1 p-4">
-        <h3 className="text-xl font-semibold mb-2 text-foreground">{name}</h3>
+        <h3 className="text-xl font-semibold mb-2 text-foreground">{type}</h3>
         <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{description}</p>
         
         <div className="flex flex-wrap gap-2">

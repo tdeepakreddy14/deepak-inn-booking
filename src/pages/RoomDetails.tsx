@@ -8,54 +8,103 @@ import { Users, Wifi, Wind, Tv, Coffee, Shield, ArrowLeft } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
 import suiteRoom from "@/assets/room-suite.jpg";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const RoomDetails = () => {
   const { id } = useParams();
+  const { token } = useAuth()
 
+  //TODO:remove
   // Mock room data (in real app, fetch from API)
-  const rooms: Record<string, any> = {
-    "1": {
-      id: 1,
-      name: "Deluxe Room",
-      image: deluxeRoom,
-      price: 2999,
-      capacity: 2,
-      hasAC: true,
-      hasWifi: true,
-      description: "Spacious room with modern amenities and king-size bed.",
-      longDescription: "Our Deluxe Room offers a perfect blend of comfort and luxury. Featuring a king-size bed with premium linens, modern furnishings, and a spacious layout, this room is ideal for couples or business travelers seeking a peaceful retreat.",
-      amenities: ["King Size Bed", "Air Conditioning", "Free WiFi", "LED TV", "Mini Bar", "Coffee Maker", "24/7 Room Service", "Safe Deposit"],
-      size: "320 sq ft",
-    },
-    "2": {
-      id: 2,
-      name: "Standard Room",
-      image: standardRoom,
-      price: 1999,
-      capacity: 2,
-      hasAC: true,
-      hasWifi: true,
-      description: "Comfortable twin bed room perfect for travelers.",
-      longDescription: "Our Standard Room provides all the essential comforts for a pleasant stay. With twin beds, modern amenities, and a cozy atmosphere, it's perfect for friends or colleagues traveling together.",
-      amenities: ["Twin Beds", "Air Conditioning", "Free WiFi", "LED TV", "Mini Bar", "Coffee Maker", "Room Service", "Safe Deposit"],
-      size: "280 sq ft",
-    },
-    "3": {
-      id: 3,
-      name: "Executive Suite",
-      image: suiteRoom,
-      price: 4999,
-      capacity: 4,
-      hasAC: true,
-      hasWifi: true,
-      description: "Luxurious suite with separate living area and premium furnishings.",
-      longDescription: "Experience ultimate luxury in our Executive Suite. Featuring a separate living area, premium furnishings, and exceptional space, this suite is perfect for families or extended stays. Enjoy panoramic views and world-class amenities.",
-      amenities: ["King Size Bed + Sofa Bed", "Separate Living Area", "Air Conditioning", "Free WiFi", "LED TV", "Mini Bar", "Coffee Maker", "24/7 Room Service", "Safe Deposit", "Work Desk", "Bathtub"],
-      size: "550 sq ft",
-    },
+  // const rooms: Record<string, any> = {
+  //   "1": {
+  //     id: 1,
+  //     name: "Deluxe Room",
+  //     image: deluxeRoom,
+  //     price: 2999,
+  //     capacity: 2,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Spacious room with modern amenities and king-size bed.",
+  //     longDescription: "Our Deluxe Room offers a perfect blend of comfort and luxury. Featuring a king-size bed with premium linens, modern furnishings, and a spacious layout, this room is ideal for couples or business travelers seeking a peaceful retreat.",
+  //     amenities: ["King Size Bed", "Air Conditioning", "Free WiFi", "LED TV", "Mini Bar", "Coffee Maker", "24/7 Room Service", "Safe Deposit"],
+  //     size: "320 sq ft",
+  //   },
+  //   "2": {
+  //     id: 2,
+  //     name: "Standard Room",
+  //     image: standardRoom,
+  //     price: 1999,
+  //     capacity: 2,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Comfortable twin bed room perfect for travelers.",
+  //     longDescription: "Our Standard Room provides all the essential comforts for a pleasant stay. With twin beds, modern amenities, and a cozy atmosphere, it's perfect for friends or colleagues traveling together.",
+  //     amenities: ["Twin Beds", "Air Conditioning", "Free WiFi", "LED TV", "Mini Bar", "Coffee Maker", "Room Service", "Safe Deposit"],
+  //     size: "280 sq ft",
+  //   },
+  //   "3": {
+  //     id: 3,
+  //     name: "Executive Suite",
+  //     image: suiteRoom,
+  //     price: 4999,
+  //     capacity: 4,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Luxurious suite with separate living area and premium furnishings.",
+  //     longDescription: "Experience ultimate luxury in our Executive Suite. Featuring a separate living area, premium furnishings, and exceptional space, this suite is perfect for families or extended stays. Enjoy panoramic views and world-class amenities.",
+  //     amenities: ["King Size Bed + Sofa Bed", "Separate Living Area", "Air Conditioning", "Free WiFi", "LED TV", "Mini Bar", "Coffee Maker", "24/7 Room Service", "Safe Deposit", "Work Desk", "Bathtub"],
+  //     size: "550 sq ft",
+  //   },
+  // };
+
+  interface Room {
+    id: number;
+    name: string;
+    image: string;
+    price: number;
+    capacity: number;
+    hasAC: boolean;
+    hasWifi: boolean;
+    description: string;
+    longDescription: string;
+    amenities: string[];
+    size: string;
+  }
+
+  const [room, setRoom] = useState<Room | null>(null);      //nullable state, because room data comes from fetch:
+
+  useEffect(() => {
+    fetchRoomById(id)
+  }, [id]);
+
+
+  const fetchRoomById = (roomId: string) => {
+
+    return fetch(`http://localhost:8000/api/rooms/${roomId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // send token
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to fetch room");
+        }
+
+        setRoom(data.data);
+        return data.data; // return room object only
+      })
+      .catch((error) => {
+        console.error("Error fetching room:", error);
+        throw error;
+      });
   };
 
-  const room = rooms[id || "1"];
 
   if (!room) {
     return (
@@ -77,7 +126,7 @@ const RoomDetails = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <div className="flex-1 container mx-auto px-4 py-8">
         {/* Back Button */}
         <Button variant="ghost" asChild className="mb-6">
@@ -109,7 +158,9 @@ const RoomDetails = () => {
                       <Users className="h-3 w-3" />
                       Up to {room.capacity} Guests
                     </Badge>
-                    <Badge variant="secondary">{room.size}</Badge>
+                    {
+                      room.size ? <Badge variant="secondary">{room.size}</Badge> : ""
+                    }
                   </div>
                 </div>
               </div>
@@ -147,7 +198,7 @@ const RoomDetails = () => {
                   <Button asChild className="w-full" size="lg">
                     <Link to={`/booking/${room.id}`}>Book Now</Link>
                   </Button>
-                  
+
                   <div className="border-t border-border pt-4">
                     <h3 className="font-semibold mb-3">Quick Highlights</h3>
                     <div className="space-y-2">

@@ -19,15 +19,14 @@ export default function AdminDashboard() {
     totalUsers: 0,
   });
 
-  // 🔴  ADMIN CHECK DISABLED FOR UI TESTING
-  /*
+  
   useEffect(() => {
     if (loading) return;      
     if (!isAdmin) {
       navigate('/', { replace: true });
     }
   }, [isAdmin, loading, navigate]);
-  */
+
 
   useEffect(() => {
     const fetchStats = async () => {

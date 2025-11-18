@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RoomCard from "@/components/RoomCard";
@@ -11,95 +11,135 @@ import { Search } from "lucide-react";
 import deluxeRoom from "@/assets/room-deluxe.jpg";
 import standardRoom from "@/assets/room-standard.jpg";
 import suiteRoom from "@/assets/room-suite.jpg";
+import { useAuth } from "@/hooks/useAuth";
 
 const Rooms = () => {
+
+  const { token } = useAuth();
+
+
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [roomType, setRoomType] = useState("all");
   const [acFilter, setAcFilter] = useState("all");
+  const [allRooms, setAllRooms] = useState([]);
 
-  const allRooms = [
-    {
-      id: 1,
-      name: "Deluxe Room",
-      image: deluxeRoom,
-      price: 2999,
-      capacity: 2,
-      hasAC: true,
-      hasWifi: true,
-      description: "Spacious room with modern amenities and king-size bed.",
-      type: "deluxe",
-    },
-    {
-      id: 2,
-      name: "Standard Room",
-      image: standardRoom,
-      price: 1999,
-      capacity: 2,
-      hasAC: true,
-      hasWifi: true,
-      description: "Comfortable twin bed room perfect for travelers.",
-      type: "standard",
-    },
-    {
-      id: 3,
-      name: "Executive Suite",
-      image: suiteRoom,
-      price: 4999,
-      capacity: 4,
-      hasAC: true,
-      hasWifi: true,
-      description: "Luxurious suite with separate living area and premium furnishings.",
-      type: "suite",
-    },
-    {
-      id: 4,
-      name: "Premium Deluxe",
-      image: deluxeRoom,
-      price: 3499,
-      capacity: 3,
-      hasAC: true,
-      hasWifi: true,
-      description: "Enhanced deluxe room with additional space and amenities.",
-      type: "deluxe",
-    },
-    {
-      id: 5,
-      name: "Budget Room",
-      image: standardRoom,
-      price: 1499,
-      capacity: 2,
-      hasAC: false,
-      hasWifi: true,
-      description: "Affordable and comfortable room for budget travelers.",
-      type: "standard",
-    },
-    {
-      id: 6,
-      name: "Family Suite",
-      image: suiteRoom,
-      price: 5999,
-      capacity: 6,
-      hasAC: true,
-      hasWifi: true,
-      description: "Spacious suite perfect for families with multiple bedrooms.",
-      type: "suite",
-    },
-  ];
+  // const allRooms = [
+  //   {
+  //     id: 1,
+  //     name: "Deluxe Room",
+  //     image: deluxeRoom,
+  //     price: 2999,
+  //     capacity: 2,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Spacious room with modern amenities and king-size bed.",
+  //     type: "deluxe",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Standard Room",
+  //     image: standardRoom,
+  //     price: 1999,
+  //     capacity: 2,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Comfortable twin bed room perfect for travelers.",
+  //     type: "standard",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Executive Suite",
+  //     image: suiteRoom,
+  //     price: 4999,
+  //     capacity: 4,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Luxurious suite with separate living area and premium furnishings.",
+  //     type: "suite",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Premium Deluxe",
+  //     image: deluxeRoom,
+  //     price: 3499,
+  //     capacity: 3,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Enhanced deluxe room with additional space and amenities.",
+  //     type: "deluxe",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Budget Room",
+  //     image: standardRoom,
+  //     price: 1499,
+  //     capacity: 2,
+  //     hasAC: false,
+  //     hasWifi: true,
+  //     description: "Affordable and comfortable room for budget travelers.",
+  //     type: "standard",
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Family Suite",
+  //     image: suiteRoom,
+  //     price: 5999,
+  //     capacity: 6,
+  //     hasAC: true,
+  //     hasWifi: true,
+  //     description: "Spacious suite perfect for families with multiple bedrooms.",
+  //     type: "suite",
+  //   },
+  // ];
+
+  useEffect(() => {
+    fetchAllRooms()
+      .then((resp) => {
+        setAllRooms(resp.data.rooms);
+        console.log(resp, "resp of all Rooms")
+      }
+      )
+  }, [])
+
+  const fetchAllRooms = () => {
+
+    return fetch("http://localhost:8000/api/rooms/", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch rooms");
+        }
+        return response.json();
+      })
+      .then(data => {
+        // data = array of rooms
+        return data;
+      })
+      .catch(error => {
+        console.error("Error fetching rooms:", error);
+        throw error;
+      });
+  };
+
 
   const filteredRooms = allRooms.filter((room) => {
-    const matchesSearch = room.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = room.type.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPrice = room.price >= priceRange[0] && room.price <= priceRange[1];
     const matchesType = roomType === "all" || room.type === roomType;
     const matchesAC = acFilter === "all" || (acFilter === "ac" ? room.hasAC : !room.hasAC);
-    
+
     return matchesSearch && matchesPrice && matchesType && matchesAC;
   });
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <div className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Our Rooms</h1>
@@ -189,7 +229,7 @@ const Rooms = () => {
                 {filteredRooms.length} room{filteredRooms.length !== 1 ? 's' : ''} found
               </p>
             </div>
-            
+
             {filteredRooms.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredRooms.map((room) => (

@@ -13,6 +13,8 @@ const Register = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [formData, setFormData] = useState({
+    full_name: "",
+    phone: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -25,41 +27,50 @@ const Register = () => {
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-    
+
     setLoading(true);
 
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error, data } = await supabase.auth.signUp({
+    const payload = {
       email: formData.email,
       password: formData.password,
-      options: {
-        emailRedirectTo: redirectUrl,
-      },
-    });
+      phone: formData.phone,
+      full_name: formData.full_name,
+    };
 
-    if (error) {
-      toast.error(error.message);
-    } else {
-      // Insert default user role
-      if (data.user) {
-        await supabase.from('user_roles').insert([
-          { user_id: data.user.id, role: 'user' }
-        ]);
-      }
-      
-      toast.success("Registration successful! You can now login.");
-      navigate("/login");
-    }
-    setLoading(false);
+    fetch("http://localhost:8000/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((err) => {
+            throw new Error(err.detail || "Registration failed");
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        toast.success("Registration successful!");
+        navigate("/login");
+      })
+      .catch((error) => {
+        toast.error(error.message || "Network error");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 py-8">
@@ -74,9 +85,34 @@ const Register = () => {
           <CardTitle className="text-2xl">Create an Account</CardTitle>
           <CardDescription>Enter your details to get started</CardDescription>
         </CardHeader>
-        
+
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+
+            <div className="space-y-2">
+              <Label htmlFor="full_name">Full Name</Label>
+              <Input
+                id="full_name"
+                type="text"
+                placeholder="John Doe"
+                value={formData.full_name}
+                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="1234567890"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                required
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -88,7 +124,7 @@ const Register = () => {
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -98,10 +134,10 @@ const Register = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
@@ -111,16 +147,18 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
+
           </CardContent>
-          
+
+
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Creating account..." : "Sign Up"}
             </Button>
-            
+
             <p className="text-sm text-center text-muted-foreground">
               Already have an account?{" "}
               <Link to="/login" className="text-primary hover:underline font-medium">

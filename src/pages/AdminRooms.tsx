@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,82 +8,115 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { fetchRooms } from '@/integrations/apis/room-apis/fetchRoom';
+import { deleteRoom } from '@/integrations/apis/room-apis/deleteRoom';
 
 interface Room {
   id: string;
-  name: string;
   type: string;
+  image: string | null;
   price: number;
-  max_guests: number;
-  has_ac: boolean;
+  capacity: number;
+  hasAC: boolean;
+  hasWifi: boolean;
+  description: string;
+  longDescription: string;
+  amenities: string[];
+  size: string;
   available: boolean;
-  image_url: string | null;
 }
+
+
+// type: formData.type,
+//     image: formData.image,
+//     price: parseFloat(formData.price),
+//     capacity: parseInt(formData.capacity),
+//     hasAC: formData.hasAC,
+//     hasWifi: formData.has_Wifi,
+//     description: formData.description,
+//     longDescription: formData.longDescription,
+//     amenities: formData.amenities
+//       .split(",")
+//       .map(a => a.trim())
+//       .filter(Boolean),
+//     size: formData.size,
+//     available: formData.available,
+
 
 export default function AdminRooms() {
   const navigate = useNavigate();
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, token } = useAuth();
   const { toast } = useToast();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
 
-  // ❌ Disabled admin check so UI can be tested
-  // useEffect(() => {
-  //   if (!loading && !isAdmin) {
-  //     navigate('/');
-  //   }
-  // }, [isAdmin, loading, navigate]);
+  useEffect(() => {
+    if (!loading && !isAdmin) {
+      navigate('/');
+    }
+  }, [isAdmin, loading, navigate]);
 
   useEffect(() => {
-    // Allow fetching even if not admin (testing mode)
-    fetchRooms();
+    callGetRooms()
+
   }, []);
 
-  const fetchRooms = async () => {
+  const callGetRooms = () => {
     setLoadingRooms(true);
-    const { data, error } = await supabase
-      .from('rooms')
-      .select('*')
-      .order('created_at', { ascending: false });
 
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch rooms',
-        variant: 'destructive',
+    //getAllRoom API call
+    fetchRooms(token)
+      .then((resp) => {
+        setRooms(resp.data.rooms);
+        console.log(resp, "resp of all Rooms");
+      })
+      .catch((err) => {
+        console.error("Error fetching rooms:", err);
+      })
+      .finally(() => {
+        setLoadingRooms(false); // must be FALSE
       });
-    } else {
-      setRooms(data || []);
-    }
-    setLoadingRooms(false);
-  };
+  }
+
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this room?')) return;
+    callDelRoom(id);
+    // if (!confirm('Are you sure you want to delete this room?')) return;
 
-    const { error } = await supabase.from('rooms').delete().eq('id', id);
+    // const { error } = await supabase.from('rooms').delete().eq('id', id);
 
-    if (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to delete room',
-        variant: 'destructive',
-      });
-    } else {
-      toast({
-        title: 'Success',
-        description: 'Room deleted successfully',
-      });
-      fetchRooms();
-    }
+
+    // if (error) {
+    //   toast({
+    //     title: 'Error',
+    //     description: 'Failed to delete room',
+    //     variant: 'destructive',
+    //   });
+    // } else {
+    //   toast({
+    //     title: 'Success',
+    //     description: 'Room deleted successfully',
+    //   });
+    //   fetchRooms();
+    // }
   };
+
+const callDelRoom = (id) => {
+  deleteRoom(id, token)
+    .then(() => {
+      callGetRooms(); // refresh room list
+    })
+    .catch(err => {
+      console.error("Delete error:", err);
+    });
+};
+
 
   if (loading || loadingRooms) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  // ❌ Removed admin restriction for UI testing
-  // if (!isAdmin) return null;
+  if (!isAdmin) return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -118,17 +150,17 @@ export default function AdminRooms() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms.map((room) => (
               <Card key={room.id} className="overflow-hidden">
-                {room.image_url && (
+                {room.image && (
                   <img
-                    src={room.image_url}
-                    alt={room.name}
+                    src={room.image}
+                    alt={room.type}
                     className="w-full h-48 object-cover"
                   />
                 )}
 
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <CardTitle className="text-xl">{room.name}</CardTitle>
+                    <CardTitle className="text-xl">{room.type}</CardTitle>
                     <Badge variant={room.available ? 'default' : 'secondary'}>
                       {room.available ? 'Available' : 'Unavailable'}
                     </Badge>
@@ -138,12 +170,12 @@ export default function AdminRooms() {
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-2">{room.type}</p>
                   <p className="text-2xl font-bold text-primary mb-2">
-                    ${room.price}/night
+                    ₹{room.price}/night
                   </p>
 
                   <div className="flex gap-2">
-                    <Badge variant="outline">{room.max_guests} guests</Badge>
-                    <Badge variant="outline">{room.has_ac ? 'AC' : 'Non-AC'}</Badge>
+                    <Badge variant="outline">{room.capacity} guests</Badge>
+                    <Badge variant="outline">{room.hasAC ? 'AC' : 'Non-AC'}</Badge>
                   </div>
                 </CardContent>
 
