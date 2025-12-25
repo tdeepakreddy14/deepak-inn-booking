@@ -1,50 +1,60 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Hotel, Users, Calendar, DollarSign } from 'lucide-react';
+import { Hotel, Users, Calendar, DollarSign ,IndianRupee} from 'lucide-react';
+import { fetchAdminStats } from '@/integrations/apis/admin/getStats';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, loading, token } = useAuth();
 
-  const [stats, setStats] = useState({
-    totalRooms: 0,
-    availableRooms: 0,
-    totalBookings: 0,
-    totalUsers: 0,
-  });
+  interface AdminStats {
+    total_rooms?: number;
+    available_rooms?: number;
+    total_bookings?: number;
+    total_users?: number;
+    total_revenue?: number;
+    monthly_revenue?: number;
+    occupancy_rate?: number;
+  }
 
-  
+  const [stats, setStats] = useState<AdminStats>({});
+
+
   useEffect(() => {
-    if (loading) return;      
+    if (loading) return;
     if (!isAdmin) {
       navigate('/', { replace: true });
     }
   }, [isAdmin, loading, navigate]);
 
-
   useEffect(() => {
-    const fetchStats = async () => {
-      const { data: rooms } = await supabase.from('rooms').select('id, available');
-      const { data: users } = await supabase.from('user_roles').select('user_id');
+    fetchAdminStats(token)
+      .then((resp) => setStats(resp.data))
+  }, [])
 
-      setStats({
-        totalRooms: rooms?.length || 0,
-        availableRooms: rooms?.filter(r => r.available).length || 0,
-        totalBookings: 0,
-        totalUsers: users?.length || 0,
-      });
-    };
 
-    // 🔴  ALLOW FETCHING EVEN IF NOT ADMIN
-    // if (isAdmin) fetchStats();
-    fetchStats();
-  }, []);
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     const { data: rooms } = await supabase.from('rooms').select('id, available');
+  //     const { data: users } = await supabase.from('user_roles').select('user_id');
+
+  //     setStats({
+  //       totalRooms: rooms?.length || 0,
+  //       availableRooms: rooms?.filter(r => r.available).length || 0,
+  //       totalBookings: 0,
+  //       totalUsers: users?.length || 0,
+  //     });
+  //   };
+
+  //   // 🔴  ALLOW FETCHING EVEN IF NOT ADMIN
+  //   // if (isAdmin) fetchStats();
+  //   fetchStats();
+  // }, []);
 
   // 🔴 REMOVE ADMIN BLOCKER (so UI always loads)
   /*
@@ -73,9 +83,9 @@ export default function AdminDashboard() {
               <Hotel className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stats.totalRooms}</div>
+              <div className="text-2xl font-bold text-foreground">{stats.total_rooms}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.availableRooms} available
+                {stats.available_rooms} available
               </p>
             </CardContent>
           </Card>
@@ -86,7 +96,7 @@ export default function AdminDashboard() {
               <Calendar className="h-4 w-4 text-accent" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stats.totalBookings}</div>
+              <div className="text-2xl font-bold text-foreground">{stats.total_bookings}</div>
               <p className="text-xs text-muted-foreground mt-1">All time</p>
             </CardContent>
           </Card>
@@ -97,7 +107,7 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4 text-secondary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stats.totalUsers}</div>
+              <div className="text-2xl font-bold text-foreground">{stats.total_users}</div>
               <p className="text-xs text-muted-foreground mt-1">Registered</p>
             </CardContent>
           </Card>
@@ -105,10 +115,10 @@ export default function AdminDashboard() {
           <Card className="border-primary/20">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-primary" />
+              <IndianRupee className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">$0</div>
+              <div className="text-2xl font-bold text-foreground">₹{stats.monthly_revenue}</div>
               <p className="text-xs text-muted-foreground mt-1">This month</p>
             </CardContent>
           </Card>

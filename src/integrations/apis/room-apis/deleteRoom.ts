@@ -1,3 +1,5 @@
+//delete Room ADMIIN req
+
 export const deleteRoom = (roomId, token) => {
   return fetch(`http://localhost:8000/api/rooms/${roomId}`, {
     method: "DELETE",

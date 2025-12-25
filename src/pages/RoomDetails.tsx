@@ -10,10 +10,12 @@ import standardRoom from "@/assets/room-standard.jpg";
 import suiteRoom from "@/assets/room-suite.jpg";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { fetchRoomById } from "@/integrations/apis/room-apis/fetchRoom";
+import { imageMap } from "@/components/RoomCard";
 
 const RoomDetails = () => {
   const { id } = useParams();
-  const { token } = useAuth()
+  const { token, loading } = useAuth()
 
   //TODO:remove
   // Mock room data (in real app, fetch from API)
@@ -61,7 +63,7 @@ const RoomDetails = () => {
 
   interface Room {
     id: number;
-    name: string;
+    type: string;
     image: string;
     price: number;
     capacity: number;
@@ -76,35 +78,22 @@ const RoomDetails = () => {
   const [room, setRoom] = useState<Room | null>(null);      //nullable state, because room data comes from fetch:
 
   useEffect(() => {
-    fetchRoomById(id)
-  }, [id]);
+    !loading && callFetchRoomById(id)
+  }, [id, loading]);
 
 
-  const fetchRoomById = (roomId: string) => {
-
-    return fetch(`http://localhost:8000/api/rooms/${roomId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // send token
-      },
-    })
-      .then(async (response) => {
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.detail || "Failed to fetch room");
-        }
-
-        setRoom(data.data);
-        return data.data; // return room object only
+  //Fetch room by ID api call
+  const callFetchRoomById = (id) => {
+    fetchRoomById(id, token)
+      .then((resp) => {
+        setRoom(resp.data);
+        console.log(resp, "room resppppppppppp")
       })
       .catch((error) => {
         console.error("Error fetching room:", error);
         throw error;
       });
-  };
-
+  }
 
   if (!room) {
     return (
@@ -121,6 +110,10 @@ const RoomDetails = () => {
         <Footer />
       </div>
     );
+  }
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">...Loading...</div>;
   }
 
   return (
@@ -142,8 +135,8 @@ const RoomDetails = () => {
             {/* Image */}
             <div className="relative h-96 rounded-lg overflow-hidden">
               <img
-                src={room.image}
-                alt={room.name}
+                src={imageMap[room.image]}
+                alt={room.type}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -152,7 +145,7 @@ const RoomDetails = () => {
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-2">{room.name}</h1>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-3">{room.type}</h1>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary" className="flex items-center gap-1">
                       <Users className="h-3 w-3" />

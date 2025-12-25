@@ -34,18 +34,21 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className="text-foreground hover:text-primary transition-colors"
-                activeClassName="text-primary font-medium"
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </div>
+          {
+            user || isAdmin ?
+              <div className="hidden md:flex items-center space-x-6">
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    className="text-foreground hover:text-primary transition-colors"
+                    activeClassName="text-primary font-medium"
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+              </div> : ""
+          }
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
@@ -94,9 +97,8 @@ const Navbar = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`block py-2 text-foreground hover:text-primary transition-colors ${
-                  location.pathname === link.to ? "text-primary font-medium" : ""
-                }`}
+                className={`block py-2 text-foreground hover:text-primary transition-colors ${location.pathname === link.to ? "text-primary font-medium" : ""
+                  }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label}

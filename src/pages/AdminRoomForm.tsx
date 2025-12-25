@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
+import { fetchRoomById } from '@/integrations/apis/room-apis/fetchRoom';
 
 export default function AdminRoomForm() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function AdminRoomForm() {
     hasWifi: true,
     image: '',
     available: true,
+    roomCount: "",
     size: ""
   });
 
@@ -41,34 +43,15 @@ export default function AdminRoomForm() {
 
   useEffect(() => {
     if (id) {
-      fetchRoomById(id);
+      callFetchRoomByID(id);
     }
   }, [id]);
 
-  const fetchRoomById = (roomId: string) => {
-
-    return fetch(`http://localhost:8000/api/rooms/${roomId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // send token
-      },
-    })
-      .then(async (response) => {
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.detail || "Failed to fetch room");
-        }
-
-        setFormData(data.data);
-        return data.data; // return room object only
-      })
-      .catch((error) => {
-        console.error("Error fetching room:", error);
-        throw error;
-      });
-  };
+  //FetchRoomByID API call 
+  const callFetchRoomByID = (id) => {
+    fetchRoomById(id, token)
+      .then((resp) => setFormData(resp.data))
+  }
 
   // const fetchRoom = async () => {
   //   const { data, error } = await supabase
@@ -132,6 +115,7 @@ export default function AdminRoomForm() {
           .filter(Boolean),
       size: formData.size,
       available: formData.available,
+      roomCount: formData.roomCount
     };
 
 
@@ -216,11 +200,11 @@ export default function AdminRoomForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price per Night ($) *</Label>
+                <Label htmlFor="price">Price per Night (₹) *</Label>
                 <Input
                   id="price"
                   type="number"
-                  step="0.01"
+                  // step="0.01"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
@@ -240,12 +224,13 @@ export default function AdminRoomForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Description *</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
+                  required
                 />
               </div>
 
@@ -266,17 +251,32 @@ export default function AdminRoomForm() {
                   value={formData.amenities}
                   onChange={(e) => setFormData({ ...formData, amenities: e.target.value })}
                   placeholder="e.g., WiFi, TV, Mini Bar"
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">Image URL</Label>
+                <Label htmlFor="image">Image</Label>
                 <Input
                   id="image"
-                  type="url"
+                  type="text"
                   value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
+                  placeholder="deluxe/standard/suite"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="roomCount">Room Count</Label>
+                <Input
+                  id="roomCount"
+                  type="number"
+                  value={formData.roomCount}
+                  max={5}
+                  onChange={(e) => setFormData({ ...formData, roomCount: e.target.value })}
+                  placeholder="No of Rooms"
+                  required
                 />
               </div>
 

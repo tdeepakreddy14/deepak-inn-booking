@@ -10,7 +10,15 @@ import { Pencil, Trash2, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { fetchRooms } from '@/integrations/apis/room-apis/fetchRoom';
 import { deleteRoom } from '@/integrations/apis/room-apis/deleteRoom';
-
+import { imageMap } from '@/components/RoomCard';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 interface Room {
   id: string;
   type: string;
@@ -27,28 +35,15 @@ interface Room {
 }
 
 
-// type: formData.type,
-//     image: formData.image,
-//     price: parseFloat(formData.price),
-//     capacity: parseInt(formData.capacity),
-//     hasAC: formData.hasAC,
-//     hasWifi: formData.has_Wifi,
-//     description: formData.description,
-//     longDescription: formData.longDescription,
-//     amenities: formData.amenities
-//       .split(",")
-//       .map(a => a.trim())
-//       .filter(Boolean),
-//     size: formData.size,
-//     available: formData.available,
-
-
 export default function AdminRooms() {
   const navigate = useNavigate();
   const { isAdmin, loading, token } = useAuth();
   const { toast } = useToast();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [selectedRoomId, setSelectedRoomId] = useState(null)
+
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -60,6 +55,16 @@ export default function AdminRooms() {
     callGetRooms()
 
   }, []);
+
+  const handleDeleteClick = (id) => {
+    setSelectedRoomId(id)
+    setOpenDeleteDialog(true)
+  }
+
+  const confirmDelete = () => {
+    handleDelete(selectedRoomId)
+    setOpenDeleteDialog(false)
+  }
 
   const callGetRooms = () => {
     setLoadingRooms(true);
@@ -81,35 +86,17 @@ export default function AdminRooms() {
 
   const handleDelete = async (id: string) => {
     callDelRoom(id);
-    // if (!confirm('Are you sure you want to delete this room?')) return;
-
-    // const { error } = await supabase.from('rooms').delete().eq('id', id);
-
-
-    // if (error) {
-    //   toast({
-    //     title: 'Error',
-    //     description: 'Failed to delete room',
-    //     variant: 'destructive',
-    //   });
-    // } else {
-    //   toast({
-    //     title: 'Success',
-    //     description: 'Room deleted successfully',
-    //   });
-    //   fetchRooms();
-    // }
   };
 
-const callDelRoom = (id) => {
-  deleteRoom(id, token)
-    .then(() => {
-      callGetRooms(); // refresh room list
-    })
-    .catch(err => {
-      console.error("Delete error:", err);
-    });
-};
+  const callDelRoom = (id) => {
+    deleteRoom(id, token)
+      .then(() => {
+        callGetRooms(); // refresh room list
+      })
+      .catch(err => {
+        console.error("Delete error:", err);
+      });
+  };
 
 
   if (loading || loadingRooms) {
@@ -152,7 +139,7 @@ const callDelRoom = (id) => {
               <Card key={room.id} className="overflow-hidden">
                 {room.image && (
                   <img
-                    src={room.image}
+                    src={imageMap[room.image]}
                     alt={room.type}
                     className="w-full h-48 object-cover"
                   />
@@ -161,7 +148,7 @@ const callDelRoom = (id) => {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-xl">{room.type}</CardTitle>
-                    <Badge variant={room.available ? 'default' : 'secondary'}>
+                    <Badge variant={room.available ? 'secondary' : 'default'}>
                       {room.available ? 'Available' : 'Unavailable'}
                     </Badge>
                   </div>
@@ -191,7 +178,7 @@ const callDelRoom = (id) => {
 
                   <Button
                     variant="destructive"
-                    onClick={() => handleDelete(room.id)}
+                    onClick={() => handleDeleteClick(room.id)}
                     className="flex-1"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
@@ -205,6 +192,28 @@ const callDelRoom = (id) => {
       </main>
 
       <Footer />
+
+      {
+        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Room?</DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete this room.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpenDeleteDialog(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete}>
+                Yes, Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      }
     </div>
   );
 }

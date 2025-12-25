@@ -8,6 +8,7 @@ import { Hotel } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
+
 const Login = () => {
   const navigate = useNavigate();
   const { user, login, isAdmin } = useAuth();

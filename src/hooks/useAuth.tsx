@@ -22,8 +22,8 @@ const AuthContext = createContext<AuthContextType>({
   token: null,
   isAdmin: false,
   loading: true,
-  login: () => {},
-  signOut: () => {},
+  login: () => { },
+  signOut: () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Load user + token from sessionStorage on page refresh
     const storedUser = sessionStorage.getItem("user");
     const storedToken = sessionStorage.getItem("token");
-    
+
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setToken(storedToken);
@@ -50,8 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = (user: User, token: string) => {
     setUser(user);
     setToken(token);
-    console.log("auth LOGIN ____________________")
-
+    setLoading(false);
     sessionStorage.setItem("user", JSON.stringify(user));
     sessionStorage.setItem("token", token);
   };

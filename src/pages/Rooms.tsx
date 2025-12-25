@@ -8,21 +8,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search } from "lucide-react";
-import deluxeRoom from "@/assets/room-deluxe.jpg";
-import standardRoom from "@/assets/room-standard.jpg";
-import suiteRoom from "@/assets/room-suite.jpg";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { fetchRooms } from "@/integrations/apis/room-apis/fetchRoom";
 
 const Rooms = () => {
 
-  const { token } = useAuth();
-
+  const { token, loading } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [roomType, setRoomType] = useState("all");
   const [acFilter, setAcFilter] = useState("all");
   const [allRooms, setAllRooms] = useState([]);
+
+  const { isLoading, error } = useQuery({
+    queryKey: ["rooms"],
+    queryFn: () => fetchRooms(token)
+      .then((resp) => {
+        setAllRooms(resp.data.rooms)
+      }),
+  });
+
 
   // const allRooms = [
   //   {
@@ -93,37 +100,42 @@ const Rooms = () => {
   //   },
   // ];
 
-  useEffect(() => {
-    fetchAllRooms()
-      .then((resp) => {
-        setAllRooms(resp.data.rooms);
-        console.log(resp, "resp of all Rooms")
-      }
-      )
-  }, [])
+
+
+  // useEffect(() => {
+  //   setLoading(true);
+  //   !loading && fetchAllRooms()
+  //     .then((resp) => {
+  //       setAllRooms(resp.data.rooms);
+  //       console.log(resp, "resp of all Rooms")
+  //     }
+  //     )
+  //     .finally(() => setLoading(false))
+  // }, [loading])
 
   const fetchAllRooms = () => {
 
-    return fetch("http://localhost:8000/api/rooms/", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch rooms");
-        }
-        return response.json();
-      })
-      .then(data => {
-        // data = array of rooms
-        return data;
-      })
-      .catch(error => {
-        console.error("Error fetching rooms:", error);
-        throw error;
-      });
+
+    // return fetch("http://localhost:8000/api/rooms/", {
+    //   method: "GET",
+    //   headers: {
+    //     "Authorization": `Bearer ${token}`,
+    //   },
+    // })
+    //   .then(response => {
+    //     if (!response.ok) {
+    //       throw new Error("Failed to fetch rooms");
+    //     }
+    //     return response.json();
+    //   })
+    //   .then(data => {
+    //     // data = array of rooms
+    //     return data;
+    //   })
+    //   .catch(error => {
+    //     console.error("Error fetching rooms:", error);
+    //     throw error;
+    //   });
   };
 
 
@@ -135,6 +147,10 @@ const Rooms = () => {
 
     return matchesSearch && matchesPrice && matchesType && matchesAC;
   });
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -197,9 +213,9 @@ const Rooms = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="deluxe">Deluxe</SelectItem>
-                      <SelectItem value="suite">Suite</SelectItem>
+                      <SelectItem value="Standard Room">Standard Room</SelectItem>
+                      <SelectItem value="Deluxe Room">Deluxe</SelectItem>
+                      <SelectItem value="Executive Suite">Suite</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

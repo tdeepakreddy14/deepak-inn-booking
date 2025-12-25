@@ -44,7 +44,8 @@ const Home = () => {
   //     description: "Luxurious suite with separate living area and premium furnishings.",
   //   },
   // ];
-  const { token } = useAuth();
+  const { user, isAdmin, token ,loading} = useAuth();
+
   interface Room {
     id: string;
     type: string;
@@ -62,15 +63,15 @@ const Home = () => {
   const [featuredRooms, setFeaturedRooms] = useState<Room[]>([]);
 
   useEffect(() => {
-    callGetRooms()
-  }, [])
+    !loading && callGetRooms()
+  }, [loading])
 
   const callGetRooms = () => {
 
     //getAllRoom API call
     fetchRooms(token)
       .then((resp) => {
-        setFeaturedRooms(resp.data.rooms);
+        setFeaturedRooms(resp.data.rooms.slice(0, 3));
         console.log(resp, "resp of all Rooms");
       })
       .catch((err) => {
@@ -126,11 +127,11 @@ const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" asChild className="text-lg">
-                <Link to="/rooms">Explore Rooms</Link>
+                <Link to={user || isAdmin ? "/rooms" : "/login"}>Explore Rooms</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="text-lg">
+              {/* <Button size="lg" variant="outline" asChild className="text-lg">
                 <Link to="/register">Book Now</Link>
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -166,28 +167,31 @@ const Home = () => {
       </section>
 
       {/* Featured Rooms Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Rooms</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Discover our carefully designed rooms that combine comfort with style.
-            </p>
-          </div>
+      {
+        user || isAdmin ?
+          (<section className="py-16">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Rooms</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Discover our carefully designed rooms that combine comfort with style.
+                </p>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {featuredRooms.map((room) => (
-              <RoomCard key={room.id} {...room} />
-            ))}
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {featuredRooms.map((room) => (
+                  <RoomCard key={room.id} {...room} />
+                ))}
+              </div>
 
-          <div className="text-center">
-            <Button size="lg" variant="outline" asChild>
-              <Link to="/rooms">View All Rooms</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+              <div className="text-center">
+                <Button size="lg" variant="outline" asChild>
+                  <Link to="/rooms">View All Rooms</Link>
+                </Button>
+              </div>
+            </div>
+          </section>) : ""
+      }
 
       <Footer />
     </div>
