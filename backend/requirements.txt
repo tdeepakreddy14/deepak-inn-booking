@@ -1,0 +1,6 @@
+fastapi[all]
+pymongo
+python-dotenv
+cryptography
+bcrypt
+pyjwt
